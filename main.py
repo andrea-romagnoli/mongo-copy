@@ -1,22 +1,12 @@
-import re
-from sys import argv, stdin
+import json
+from sys import argv
 
 from pymongo import MongoClient
 
 
 def main():
-    """
-    How to insert find dict:
-    * Windows: echo { "key1": "value 1", "key2": "value 2" } | python main.py
-    * Linux: echo '{ "key1": "value 1", "key2": "value 2" }' | python main.py
-    """
-
-    # Read data
-
     option = read_input_argv()
     data = read_data_from_mongo(option)
-
-    # Print results
 
     for document in data:
         print(document)
@@ -32,8 +22,8 @@ def read_input_argv() -> dict:
         Dict containing parsed input arguments.
     """
 
-    if len(argv) != 5:
-        raise ValueError(f"Expected 4 arguments, received {len(argv) - 1}")
+    if len(argv) not in [5, 6]:
+        raise ValueError(f"Expected 4 or 5 arguments, received {len(argv) - 1}")
 
     option = {
         'host': argv[1],
@@ -41,8 +31,9 @@ def read_input_argv() -> dict:
         'database': argv[3],
         'collection': argv[4]
     }
-    if stdin.isatty() and type(stdin) == dict:
-        option['find'] = stdin
+
+    if len(argv) == 6:
+        option['find'] = json.loads(argv[5])
 
     return option
 
